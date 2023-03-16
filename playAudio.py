@@ -24,8 +24,11 @@
 
 import wave
 import sys
-
-import pyaudio
+import subprocess
+try: #This will be removed when we make an installation script
+	import pyaudio
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
 
 CHUNK = 1024
 

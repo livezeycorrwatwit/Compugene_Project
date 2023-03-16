@@ -22,10 +22,15 @@
 #  
 #  
 
+import os
 import wave
 import sys
-import pyaudio
 import subprocess
+try: #This will eventually be moved to an installation script for all relevant libraries
+	import pyaudio
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
+
 
 '''
 This script records a .wav file of a provided length using the currently registered audio input.
@@ -64,11 +69,26 @@ def record(length):
 
 #Creates new file that with sample rate reduced by given factor (df) and with selected bit-depth (bd)   
 def decimate(filename, bd, df):	
-	##Get up filepath where sox.exe is
-	FilePath=r"C:\Users\vidali\Desktop\AudioTools\sox-14-4-2"
-	
-	##Run sox.exe at verbose level 1 (-V1) only errors will be outputted to std-out	
-	subprocess.call(['sox.exe', '-V1', FILENAME, '-b', bd, filename, 'downsample', df], stdout=subprocess.PIPE)
+
+	r = open("userdata.txt", "r")
+	SoxFilePath = r.read()
+	r.close()
+	#print(SoxFilePath)	
+
+	###Run sox.exe at verbose level 1 (-V1) only errors will be outputted to std-out	
+	try:
+		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', bd, filename, 'downsample', df], stdout=subprocess.PIPE)
+	except:
+		#Finds sox's location when it is missing, alters it based on the assumption of relative directories
+		SoxFilePath = __file__[0:__file__.rfind('\\')] + "\\sox-14-4-2\\sox.exe"
+
+		w = open("userdata.txt", "w")
+		w.write(SoxFilePath)
+		w.close()
+		#print(SoxFilePath)
+
+		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', bd, filename, 'downsample', df], stdout=subprocess.PIPE)
+
 	return 0
 
 ##Basic case to test functions without arguments
