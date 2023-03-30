@@ -45,7 +45,6 @@ with wave.open(sys.argv[1], 'rb') as wf:
                     channels=wf.getnchannels(),
                     rate=wf.getframerate(),
                     output=True)
-
     # Play samples from the wave file (3)
     while len(data := wf.readframes(CHUNK)):  # Requires Python 3.8+ for :=
         stream.write(data)
