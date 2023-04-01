@@ -28,6 +28,7 @@ import sys
 import subprocess
 try: #This will eventually be moved to an installation script for all relevant libraries
 	import pyaudio
+	print("py audio works")
 except: 
 	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
 

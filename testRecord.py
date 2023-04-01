@@ -45,10 +45,10 @@ def decimate(filename, bd, df):
 	SoxFilePath = r.read()
 	r.close()
 	#print(SoxFilePath)	
-
+	print("types: ---------",bd,df,type(bd),type(df))
 	###Run sox.exe at verbose level 1 (-V1) only errors will be outputted to std-out	
 	try:
-		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', bd, filename, 'downsample', df], stdout=subprocess.PIPE)
+		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', str(bd), filename, 'downsample', str(df)], stdout=subprocess.PIPE)
 	except:
 		#Finds sox's location when it is missing, alters it based on the assumption of relative directories
 		SoxFilePath = __file__[0:__file__.rfind('\\')] + "\\sox-14-4-2\\sox.exe"
@@ -58,10 +58,9 @@ def decimate(filename, bd, df):
 		w.close()
 		#print(SoxFilePath)
 
-		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', bd, filename, 'downsample', df], stdout=subprocess.PIPE)
-
+		subprocess.call([SoxFilePath, '-V1', FILENAME, '-b', str(bd), filename, 'downsample', str(df)], stdout=subprocess.PIPE)
 	return 0
 
-def recordAudio(gui):
+def recordAudio(gui, depth, dfactor):
 	record(gui)
-	decimate('newfile.wav', '8', '2')
+	decimate('newfile.wav', depth, dfactor)
