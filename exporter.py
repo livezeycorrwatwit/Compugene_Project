@@ -30,6 +30,11 @@ import os
 import pyaudio #fix in install script
 import wave
 
+class exporter:
+	def export(audio_seg, filename):
+		audio_seg.export(filename, format="wav")
+
+#merge the two of these together
 def export():
     newfile = asksaveasfilename(filetypes=[("wav file", ".wav")],defaultextension=".wav")
                 

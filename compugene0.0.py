@@ -31,6 +31,21 @@ from pydub import AudioSegment
 
 def main(args):
 	
+
+	#initialize all classes here | two recorder classes
+
+	#call and create gui here
+
+
+
+
+
+
+
+
+
+	'''
+
 	#NOTE: The constructors for recorder and processor both require we establish a MASTER sample rate. Either 44100 or 48000. Both classes refer to this master sample rate when performing certain calculations, hence we need to keep them consistent
 	
 	##Record Audio
@@ -87,11 +102,10 @@ class recorder:
 	CHANNELS = 1 if sys.platform == 'darwin' else 2
 	RATE = int(44100) ##Master sample rate
 	FILENAME="output.wav"
-	master_framerate = 44100
 	
 	def __init__(self, master_framerate):
 		if (master_framerate!=44100):
-			self.master_framerate=master_framerate
+			self.RATE=master_framerate
 	
 	def record(self, length, bitdepth, decimation):
 		self.o_record(length)
@@ -242,7 +256,7 @@ class looper:
 				
 			stream.close()
 			p.terminate()
-
+	'''
 
 if __name__ == '__main__':
     import sys

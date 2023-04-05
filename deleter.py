@@ -25,6 +25,7 @@
 import os
 from tkinter import *
 
+#change the files it deletes
 #will need additional functionality later to interact with GUI to change Play/Stop -> Record
 def delete(): 
 
