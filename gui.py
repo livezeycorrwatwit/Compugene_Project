@@ -72,7 +72,7 @@ class GUIWindow:
     def makeGuiWindow(self):
 
         def reverseAudio(): #test
-            self.proc.reverse(self.audio_seg)
+            self.audio_seg = self.proc.reverse(self.audio_seg)
 
         def restartAudio(): #reset audio back to previous state
             pass
@@ -138,7 +138,7 @@ class GUIWindow:
         playRecAudioButton.place(relx=.44, rely=.6, relwidth=.12, relheight=.07)
         playRecAudioButton.configure(command= lambda : self.playRecAudio(playRecAudioButton))
 
-        reverseAudioButton = Button(text="REVERSE",command= lambda : reverseAudio(self)).place(relx=.57, rely=.6, relwidth=.07, relheight=.05)
+        reverseAudioButton = Button(text="REVERSE",command= lambda : reverseAudio()).place(relx=.57, rely=.6, relwidth=.07, relheight=.05)
         resetAudioButton = Button(text="RESTART", command=lambda : restartAudio()).place(relx=.36, rely=.6, relwidth=.07, relheight=.05)
         deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio()).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
         exportAudioButton = Button(text="Export Audio", command= lambda : exportAudio()).place(relx=.76, rely=.85, relwidth=.17, relheight=.07)
