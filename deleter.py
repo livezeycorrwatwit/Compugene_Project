@@ -31,4 +31,6 @@ def delete():
 
     #button["text"]="RECORD"
     os.remove(os.path.join(__file__[0:__file__.rfind('\\')],"output.wav"))
+    os.remove(os.path.join(__file__[0:__file__.rfind('\\')],"decimated.wav"))
     return 0
+

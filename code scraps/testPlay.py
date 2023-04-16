@@ -10,7 +10,7 @@ except:
 CHUNK = 1024
 
 def playAudio():
-    with wave.open('newfile.wav', 'rb') as wf:
+    with wave.open('decimated.wav', 'rb') as wf:
 	
         # Instantiate PyAudio and initialize PortAudio system resources (1)
         p = pyaudio.PyAudio()

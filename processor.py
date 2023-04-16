@@ -28,7 +28,7 @@ class processor:
 		
 		pitched_sound=audio._spawn(audio.raw_data, overrides={'frame_rate': new_sample_rate})
 		
-		pitched_sound = pitched_sound.set_frame_rate(master_framerate)
+		pitched_sound = pitched_sound.set_frame_rate(self.master_framerate)
 		self.audio=pitched_sound
 		return pitched_sound
 

@@ -26,29 +26,10 @@
 from tkinter import *
 from tkinter.filedialog import asksaveasfilename
 
-import os
-import pyaudio #fix in install script
-import wave
-
 class exporter:
-	def export(audio_seg, filename):
-		audio_seg.export(filename, format="wav")
+    def export(self,audio_seg):
+        filename = asksaveasfilename(filetypes=[("wav file", ".wav")],defaultextension=".wav")
+        audio_seg.export(filename, format="wav")#export with same name
 
-#merge the two of these together
-def export():
-    newfile = asksaveasfilename(filetypes=[("wav file", ".wav")],defaultextension=".wav")
-                
-    reader=wave.open("newfile.wav",'rb')
-    a1 = reader.getnchannels()
-    a2 = reader.readframes(reader.getnframes())
-    reader.close()
-
-    writer=wave.open(newfile,'wb')
-    writer.setnchannels(reader.getnchannels())
-    writer.setsampwidth(pyaudio.PyAudio().get_sample_size(pyaudio.paInt16))
-    writer.setframerate(int(44100))
-    writer.writeframes(a2)
-
-    writer.close()
-    pyaudio.PyAudio().terminate()
-                
+    def export2(self,audio_seg):
+        audio_seg.export("modified.wav", format="wav")
