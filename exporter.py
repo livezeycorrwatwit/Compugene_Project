@@ -28,8 +28,9 @@ from tkinter.filedialog import asksaveasfilename
 
 class exporter:
     def export(self,audio_seg):
-        filename = asksaveasfilename(filetypes=[("wav file", ".wav")],defaultextension=".wav")
-        audio_seg.export(filename, format="wav")#export with same name
+        filename = asksaveasfilename(filetypes=[("wav file", ".wav"), ("mp3 file",".mp3"), ("aiff file",".aiff")],defaultextension=".wav")
+        print(filename)
+        audio_seg.export(filename, format="wav")
 
-    def export2(self,audio_seg):
+    def export2(self,audio_seg): #used for playback
         audio_seg.export("modified.wav", format="wav")

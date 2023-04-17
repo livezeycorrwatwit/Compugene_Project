@@ -87,7 +87,6 @@ class GUIWindow:
             self.audio_seg = None
             self.revflag = False
             deleter.delete()
-            pass
 
         def exportAudio(): #add additional formats?
             self.exp.export(self.audio_seg)
@@ -95,7 +94,6 @@ class GUIWindow:
 
         def adjustVol():
             self.audio_seg = self.proc.amplify(self.audio_seg, self.vol.get())
-            pass
 
         def adjustPit(): #speed controller
             self.audio_seg = self.proc.alter_speed(self.audio_seg, self.pitch.get())
@@ -169,12 +167,25 @@ class GUIWindow:
         pitchLabel = Label(text="Pitch (Hz)", font=myFont).place(relx=.04, rely=.82)
         sampleRates = ["48k","44.1k", "24k","22.05k","12k","11.025k", "6k","5.5125k", "3k", "2.75625k"]
         bitDepths = ["16","8"]
+        inputDevices = self.rec44k.getInputDevices() 
+        self.rec48k.getInputDevices()
+        outputDevices = self.looper.getOutputDevices()
+
         sampleRateInitial = StringVar()
         sampleRateInitial.set("44.1k")
         sampleRateMenu = OptionMenu(window,sampleRateInitial,*sampleRates, command=self.selectSample).place(relx=.15, rely=.04, relwidth=.2, relheight=.1)
+        
         bitDepthInitial = StringVar()
         bitDepthInitial.set("16")
         bitDepthMenu = OptionMenu(window,bitDepthInitial,*bitDepths, command=self.selectDepth).place(relx=.36, rely=.04, relwidth=.2, relheight=.1)
+        
+        inputDeviceInitial = IntVar()
+        inputDeviceInitial.set("Default Input")
+        inputDeviceMenu = OptionMenu(window,inputDeviceInitial,*inputDevices, command=self.selectInput).place(relx=.57, rely=.04, relwidth=.2, relheight=.1)
+        
+        outputDeviceInitial = IntVar()
+        outputDeviceInitial.set("Default Output")
+        bitDepthMenu = OptionMenu(window,outputDeviceInitial,*outputDevices, command=self.looper.setDefaultOutput).place(relx=.78, rely=.04, relwidth=.2, relheight=.1)
         
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()
@@ -220,6 +231,10 @@ class GUIWindow:
             self.bd="8"
         else:  
             print("Not valid sample rate")
+
+    def selectInput(self,selection): 
+        self.rec44k.setRecorderInput(selection)
+        self.rec48k.setRecorderInput(selection)
 
     def getAudio(self):
         return self.has_audio

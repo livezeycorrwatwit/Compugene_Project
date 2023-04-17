@@ -20,6 +20,37 @@ class recorder: #give decimate
 	def __init__(self, master_framerate):
 		if (master_framerate!=44100):
 			self.RATE=master_framerate
+		self.inputs = {}
+		self.input_index = None
+
+
+
+
+
+
+
+
+
+	def getInputDevices(self): 
+		p = pyaudio.PyAudio()
+		host = p.get_host_api_info_by_index(0)
+		n = host.get('deviceCount')
+		self.inputs = {}
+
+		for i in range(0, n):
+			if(p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+				self.inputs[p.get_device_info_by_host_api_device_index(0, i).get('name')] = i
+
+		return self.inputs #return dictionary of name -> index
+
+	def setRecorderInput(self,x): #takes name, reads dictionary enters in number as index
+		print(type(self.inputs[x]))
+		print(self.inputs[x])
+		self.input_index = self.inputs[x]
+
+
+
+
 	
 	def record(self, gui, bitdepth, decimation):
 		self.o_record(gui)
@@ -37,7 +68,7 @@ class recorder: #give decimate
 			wf.setsampwidth(p.get_sample_size(self.FORMAT))
 			wf.setframerate(self.RATE)
 
-			stream = p.open(format=self.FORMAT, channels=self.CHANNELS, rate=self.RATE, input=True)
+			stream = p.open(format=self.FORMAT, channels=self.CHANNELS, rate=self.RATE, input=True, input_device_index=self.input_index)
 
 			print('Recording...')
 			while(gui.getRecording()):
