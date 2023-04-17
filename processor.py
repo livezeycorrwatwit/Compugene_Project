@@ -9,6 +9,7 @@ class processor:
 	speed = 1.0
 	master_framerate = 44100
 	audio = "None"
+	master = "None"
 	
 	def __init__(self, master_framerate, filename):
 		print("processor initialized")
@@ -18,6 +19,7 @@ class processor:
 			self.master_framerate=master_framerate	
 		audio = AudioSegment.from_wav(filename)
 		self.audio=audio
+		self.master=audio
 	
 	def alter_speed(self, audio, mult):
 		octaves = 0.5
@@ -54,6 +56,9 @@ class processor:
 	
 	def get_audiosegment(self):
 		return self.audio
+
+	def get_master(self):
+		return self.master
 	
 	def is_fwd(self):
 		return self.fwd

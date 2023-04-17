@@ -23,7 +23,6 @@ class looper:
 			
 			while gui.getPlaying():
 				self.play_audio(wf, p, stream, gui)
-				wf = wave.open(filename, 'rb')
-				
+				wf = wave.open(filename, 'rb')				
 			stream.close()
 			p.terminate()

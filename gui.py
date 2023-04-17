@@ -9,7 +9,6 @@ from looper import looper
 from processor import processor
 from exporter import exporter
 import deleter
-import time
 
 class GUIWindow:
 
@@ -25,11 +24,14 @@ class GUIWindow:
         self.rec48k = recorder(48000)
         self.looper = looper()
         self.exp = exporter()
+        self.vol= None
+        self.pitch = None
+        self.revflag = False
         self.proc = None
         self.audio_seg = None
         self.is_44k = True
 
-    def playRecAudio(self, button): #needs to be changed to reflect processing
+    def playRecAudio(self, button): 
 
         depth=self.bd
         dfactor=self.df
@@ -46,7 +48,6 @@ class GUIWindow:
             else:
                 self.proc = processor(48000, "decimated.wav")
             self.audio_seg = self.proc.get_audiosegment()
-            print(self.audio_seg)
         elif not self.has_audio:  
             self.is_recording=True
             button["text"]="RECORDING"
@@ -71,13 +72,14 @@ class GUIWindow:
 
     def makeGuiWindow(self):
 
-        def reverseAudio(): #test
-            self.audio_seg = self.proc.reverse(self.audio_seg)
+        def processAudio(): 
+            self.audio_seg=self.proc.get_master() #revert audio_seg back to its previous state
+            adjustVol()
+            adjustPit()
+            if self.revflag:
+                reverseAudio()
 
-        def restartAudio(): #reset audio back to previous state
-            pass
-
-        def deleteAudio(): #reset processor
+        def deleteAudio():
             self.has_audio = False
             self.proc = None
             self.audio_seg = None
@@ -88,17 +90,22 @@ class GUIWindow:
             self.exp.export(self.audio_seg)
             pass
 
-        def adjustVol(self):
-            #self.audio_seg = self.proc.amplify(audio_seg, 6)
+        def adjustVol():
+            self.audio_seg = self.proc.amplify(self.audio_seg, self.vol.get())
             pass
 
-        def adjustPit(self,pitch_mult): #speed controller
-            #self.audio_seg = alter_speed(self.audio_seg,pitch_mult)
-            pass
+        def adjustPit(): #speed controller
+            self.audio_seg = self.proc.alter_speed(self.audio_seg, self.pitch.get())
+
+        def reverseAudio(): 
+            self.audio_seg = self.proc.reverse(self.audio_seg)
 
         def adjustTrim(self,startpoint,endpoint): 
             #trim(self.audio_seg,startpoint,endpoint)
             pass
+
+        def setReverse():
+            self.revflag = not self.revflag
 
         def on_close():#closes threads on shutdown, also confirms user wants to quit
             if messagebox.askokcancel("Quit", "You will lose all unexported files, do you still want to quit?"):
@@ -122,6 +129,9 @@ class GUIWindow:
         window=Tk()
         window.title('Compugene')
         window.geometry("600x400+40+50")
+
+        self.vol=IntVar()
+        self.pitch=DoubleVar()
         #myCanvas = Canvas(window)
         #myCanvas.place(x=-2, y=-2, relwidth=1.02, relheight=1.02)
 
@@ -138,13 +148,19 @@ class GUIWindow:
         playRecAudioButton.place(relx=.44, rely=.6, relwidth=.12, relheight=.07)
         playRecAudioButton.configure(command= lambda : self.playRecAudio(playRecAudioButton))
 
-        reverseAudioButton = Button(text="REVERSE",command= lambda : reverseAudio()).place(relx=.57, rely=.6, relwidth=.07, relheight=.05)
-        resetAudioButton = Button(text="RESTART", command=lambda : restartAudio()).place(relx=.36, rely=.6, relwidth=.07, relheight=.05)
+        reverseAudioButton = Button(text="REVERSE",command= lambda : setReverse()).place(relx=.57, rely=.6, relwidth=.07, relheight=.05)
+        resetAudioButton = Button(text="PROCESS", command=lambda : processAudio()).place(relx=.36, rely=.6, relwidth=.07, relheight=.05)
         deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio()).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
         exportAudioButton = Button(text="Export Audio", command= lambda : exportAudio()).place(relx=.76, rely=.85, relwidth=.17, relheight=.07)
         audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
-        volumeSlider = Scale(from_=0, to=160, showvalue=0, orient=HORIZONTAL, tickinterval=0, command=lambda : adjustVol(self)).place(relx=.05, rely=.72, relheight=.08, relwidth=.27)
-        pitchSlider = Scale(from_=0, to=160, showvalue=0, orient=HORIZONTAL, tickinterval=0, command=lambda : adjustPit(self,0)).place(relx=.05, rely=.89, relheight=.08, relwidth=.27)
+        
+        volumeSlider = Scale(from_=-24, to=24, orient=HORIZONTAL, resolution=3, variable=self.vol)
+        volumeSlider.place(relx=.05, rely=.72, relheight=.08, relwidth=.27)
+        volumeSlider.set(0)
+        pitchSlider = Scale(from_=.005, to=5, orient=HORIZONTAL, resolution=.005, variable=self.pitch)
+        pitchSlider.place(relx=.05, rely=.89, relheight=.08, relwidth=.27)
+        pitchSlider.set(1)
+        
         myFont = font.Font(family="Helvetica", size=16, weight='bold', slant='italic')
         volumeLabel = Label(text="Volume", font=myFont).place(relx=.04, rely=.65)
         pitchLabel = Label(text="Pitch", font=myFont).place(relx=.04, rely=.82)
