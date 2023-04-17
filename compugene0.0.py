@@ -22,17 +22,25 @@
 #  
 #
 
-import wave
 import sys
-import pyaudio
 import subprocess 
-from pydub import AudioSegment
+try: 
+	import pyaudio
+	print("pyaudio works")
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
+
+try: 
+	import pydub
+	print("pydub works")
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pydub'])
 
 
 def main(args):
 	
 
-	#initialize all classes here | two recorder classes
+	
 
 	#call and create gui here
 

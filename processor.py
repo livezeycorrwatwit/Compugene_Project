@@ -1,6 +1,3 @@
-#look at processAudio to make necessary modifications
-
-#then move to GUI
 
 from pydub import AudioSegment
 

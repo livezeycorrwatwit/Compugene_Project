@@ -78,11 +78,14 @@ class GUIWindow:
             adjustPit()
             if self.revflag:
                 reverseAudio()
+            #adjustTrim(startpoint,endpoint)
 
-        def deleteAudio():
+        def deleteAudio(button):
+            button["text"]="RECORD"
             self.has_audio = False
             self.proc = None
             self.audio_seg = None
+            self.revflag = False
             deleter.delete()
             pass
 
@@ -148,9 +151,9 @@ class GUIWindow:
         playRecAudioButton.place(relx=.44, rely=.6, relwidth=.12, relheight=.07)
         playRecAudioButton.configure(command= lambda : self.playRecAudio(playRecAudioButton))
 
-        reverseAudioButton = Button(text="REVERSE",command= lambda : setReverse()).place(relx=.57, rely=.6, relwidth=.07, relheight=.05)
-        resetAudioButton = Button(text="PROCESS", command=lambda : processAudio()).place(relx=.36, rely=.6, relwidth=.07, relheight=.05)
-        deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio()).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
+        reverseAudioButton = Button(text="REVERSE",command= lambda : setReverse()).place(relx=.57, rely=.6, relwidth=.1, relheight=.05)
+        processAudioButton = Button(text="PROCESS", command=lambda : processAudio()).place(relx=.33, rely=.6, relwidth=.1, relheight=.05)
+        deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio(playRecAudioButton)).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
         exportAudioButton = Button(text="Export Audio", command= lambda : exportAudio()).place(relx=.76, rely=.85, relwidth=.17, relheight=.07)
         audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
         
@@ -162,9 +165,9 @@ class GUIWindow:
         pitchSlider.set(1)
         
         myFont = font.Font(family="Helvetica", size=16, weight='bold', slant='italic')
-        volumeLabel = Label(text="Volume", font=myFont).place(relx=.04, rely=.65)
-        pitchLabel = Label(text="Pitch", font=myFont).place(relx=.04, rely=.82)
-        sampleRates = ["44.1k", "22.05k","11.025k", "5.5125k", "2.75625k","48k","24k","12k","6k","3k"]
+        volumeLabel = Label(text="Volume (±db)", font=myFont).place(relx=.04, rely=.65)
+        pitchLabel = Label(text="Pitch (Hz)", font=myFont).place(relx=.04, rely=.82)
+        sampleRates = ["48k","44.1k", "24k","22.05k","12k","11.025k", "6k","5.5125k", "3k", "2.75625k"]
         bitDepths = ["16","8"]
         sampleRateInitial = StringVar()
         sampleRateInitial.set("44.1k")
