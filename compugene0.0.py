@@ -39,18 +39,7 @@ except:
 
 def main(args):
 	
-
-	
-
 	#call and create gui here
-
-
-
-
-
-
-
-
 
 	'''
 
@@ -265,6 +254,7 @@ class looper:
 			stream.close()
 			p.terminate()
 	'''
+	pass
 
 if __name__ == '__main__':
     import sys

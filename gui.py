@@ -30,6 +30,10 @@ class GUIWindow:
         self.proc = None
         self.audio_seg = None
         self.is_44k = True
+        self.playRecAudioImage = None
+        self.playRecAudioButton = None
+        self.reverseAudioImage = None
+        self.reverseAudioButton = None
 
     def playRecAudio(self, button): 
 
@@ -39,7 +43,8 @@ class GUIWindow:
         if self.is_recording:
             self.is_recording=False
             print(self.is_recording)
-            button["text"]="PLAY"
+            self.playRecAudioImage = PhotoImage(file =".\\png\\Play_NotPress.png")
+            button.configure(image=self.playRecAudioImage)
             self.record_thread.join()
             self.record_thread=None
             self.has_audio=True
@@ -50,24 +55,44 @@ class GUIWindow:
             self.audio_seg = self.proc.get_audiosegment()
         elif not self.has_audio:  
             self.is_recording=True
-            button["text"]="RECORDING"
             if self.is_44k:
                 self.record_thread = threading.Thread(target=self.rec44k.record, args=(self,depth,dfactor,))
             else:
                 self.record_thread = threading.Thread(target=self.rec48k.record, args=(self,depth,dfactor,))
             self.record_thread.start()
+            
         elif self.is_playing:
-            button["text"]="PLAY"
+            self.playRecAudioImage = PhotoImage(file =".\\png\\Play_NotPress.png")
+            button.configure(image=self.playRecAudioImage)
             self.is_playing=False
             self.play_thread.join()
             self.play_thread=None
         else:
             print("RUNNING THE THING")
             self.exp.export2(self.audio_seg)
-            button["text"]="PAUSE"
+            self.playRecAudioImage = PhotoImage(file =".\\png\\Stop_NotPress.png")
+            button.configure(image=self.playRecAudioImage)
             self.is_playing=True
             self.play_thread = threading.Thread(target=self.looper.loop_audio, args=("modified.wav",self,))
             self.play_thread.start()
+
+    def changePlayRecAudioLook(self, event):
+            if self.is_recording:
+                self.playRecAudioImage = PhotoImage(file =".\\png\\Stop_Press.png")
+                self.playRecAudioButton.configure(image=self.playRecAudioImage)
+            elif not self.has_audio:
+                self.playRecAudioImage = PhotoImage(file =".\\png\\Record_Press.png")
+                self.playRecAudioButton.configure(image=self.playRecAudioImage)
+            elif self.is_playing:
+                self.playRecAudioImage = PhotoImage(file =".\\png\\Stop_Press.png")
+                self.playRecAudioButton.configure(image=self.playRecAudioImage)
+            else:
+                self.playRecAudioImage = PhotoImage(file =".\\png\\Play_Press.png")
+                self.playRecAudioButton.configure(image=self.playRecAudioImage)
+    
+    def changeReverseAudioLook(self, event):
+        self.reverseAudioImage = PhotoImage(file =".\\new_png\\Reverse_Press.png")
+        self.reverseAudioButton.configure(image=self.reverseAudioImage)
 
 
     def makeGuiWindow(self):
@@ -109,6 +134,8 @@ class GUIWindow:
 
         def setReverse():
             self.revflag = not self.revflag
+            self.reverseAudioImage=PhotoImage(file =".\\new_png\\Reverse_NotPress.png")
+            self.reverseAudioButton.configure(image=self.reverseAudioImage)
 
         def on_close():#closes threads on shutdown, also confirms user wants to quit
             if messagebox.askokcancel("Quit", "You will lose all unexported files, do you still want to quit?"):
@@ -147,13 +174,21 @@ class GUIWindow:
         scrHeight = window.winfo_height()
         scrWidth = window.winfo_width()
 
-        playRecAudioButton = ttk.Button(text="RECORD")
-        playRecAudioButton.place(relx=.44, rely=.6, relwidth=.12, relheight=.07)
-        playRecAudioButton.configure(command= lambda : self.playRecAudio(playRecAudioButton))
+        #playRecAudioImage = PhotoImage(file = __file__[0:__file__.rfind('\\')] + "\\png\\Record_NotPress.png")
+        #playRecAudioImage = PhotoImage(file =r"C:\\Users\\livezeycorrw\\VSWorkspace\\SoftwareEngFinal\\Compugene_Project\\png\\Record_NotPress.png") 
+        self.playRecAudioImage=PhotoImage(file =".\\png\\Record_NotPress.png")
+        self.playRecAudioButton = Button(text="RECORD", image=self.playRecAudioImage, borderwidth=0)
+        self.playRecAudioButton.place(relx=.44, rely=.5, width=120, height=170)
+        self.playRecAudioButton.configure(command= lambda : self.playRecAudio(self.playRecAudioButton))
+        self.playRecAudioButton.bind('<ButtonPress>',self.changePlayRecAudioLook)
 
-        reverseAudioButton = Button(text="REVERSE",command= lambda : setReverse()).place(relx=.57, rely=.6, relwidth=.1, relheight=.05)
+        self.reverseAudioImage=PhotoImage(file =".\\new_png\\Reverse_NotPress.png")
+        self.reverseAudioButton=Button(image=self.reverseAudioImage, command = lambda : setReverse(), borderwidth=0)
+        self.reverseAudioButton.place(relx=.57, rely=.6, width=70, height=89)
+        self.reverseAudioButton.bind('<ButtonPress>',self.changeReverseAudioLook)
+        
         processAudioButton = Button(text="PROCESS", command=lambda : processAudio()).place(relx=.33, rely=.6, relwidth=.1, relheight=.05)
-        deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio(playRecAudioButton)).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
+        deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio(self.playRecAudioButton)).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
         exportAudioButton = Button(text="Export Audio", command= lambda : exportAudio()).place(relx=.76, rely=.85, relwidth=.17, relheight=.07)
         audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
         

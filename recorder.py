@@ -3,7 +3,8 @@ import subprocess
 import sys
 import wave
 import pyaudio
-
+from tkinter import *
+from tkinter import PhotoImage
 #
 
 class recorder: #give decimate
@@ -40,6 +41,8 @@ class recorder: #give decimate
 			stream = p.open(format=self.FORMAT, channels=self.CHANNELS, rate=self.RATE, input=True)
 
 			print('Recording...')
+			gui.playRecAudioImage = PhotoImage(file =".\\png\\Stop_NotPress.png")
+			gui.playRecAudioButton.configure(image=gui.playRecAudioImage)
 			while(gui.getRecording()):
 				wf.writeframes(stream.read(self.CHUNK))
 			print('Done')
