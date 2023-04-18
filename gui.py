@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter.font as font
+from PIL import Image, ImageTk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter.ttk import Combobox
@@ -35,6 +36,12 @@ class GUIWindow:
         self.playRecAudioButton = None
         self.reverseAudioImage = None
         self.reverseAudioButton = None
+        self.processAudioImage = None
+        self.processAudioButton = None
+        self.deleteAudioImage = None
+        self.deleteAudioButton = None
+        self.exportAudioButton = None
+        self.exportAudioImage = None
 
     def playRecAudio(self, button): 
 
@@ -92,13 +99,26 @@ class GUIWindow:
                 self.playRecAudioButton.configure(image=self.playRecAudioImage)
     
     def changeReverseAudioLook(self, event):
-        self.reverseAudioImage = PhotoImage(file =".\\new_png\\Reverse_Press.png")
+        self.reverseAudioImage = PhotoImage(file =".\\png\\Reverse_Press.png")
         self.reverseAudioButton.configure(image=self.reverseAudioImage)
 
+    def changeProcessAudioLook(self, event):
+        self.processAudioImage = PhotoImage(file =".\\png\\Process_Audio_Press.png")
+        self.processAudioButton.configure(image=self.processAudioImage)
+
+    def changeDeleteAudioLook(self, event):
+        self.deleteAudioImage = PhotoImage(file =".\\png\\Delete_Recording_Press.png")
+        self.deleteAudioButton.configure(image=self.deleteAudioImage)
+
+    def changeExportAudioLook(self, event):
+        self.exportAudioImage = PhotoImage(file =".\\png\\Export_Press.png")
+        self.exportAudioButton.configure(image=self.exportAudioImage)
 
     def makeGuiWindow(self):
 
         def processAudio(): 
+            self.processAudioImage = PhotoImage(file =".\\png\\Process_Audio_NotPress.png")
+            self.processAudioButton.configure(image=self.processAudioImage)
             self.audio_seg=self.proc.get_master() #revert audio_seg back to its previous state
             adjustVol()
             adjustPit()
@@ -113,9 +133,15 @@ class GUIWindow:
             self.audio_seg = None
             self.revflag = False
             deleter.delete()
+            self.playRecAudioImage = PhotoImage(file =".\\png\\Record_NotPress.png")
+            self.playRecAudioButton.configure(image=self.playRecAudioImage)
+            self.deleteAudioImage = PhotoImage(file =".\\png\\Delete_Recording_NotPress.png")
+            self.deleteAudioButton.configure(image=self.deleteAudioImage)
 
         def exportAudio(): #add additional formats?
             self.exp.export(self.audio_seg)
+            self.exportAudioImage = PhotoImage(file =".\\png\\Export_NotPress.png")
+            self.exportAudioButton.configure(image=self.exportAudioImage)
             pass
 
         def adjustVol():
@@ -133,7 +159,7 @@ class GUIWindow:
 
         def setReverse():
             self.revflag = not self.revflag
-            self.reverseAudioImage=PhotoImage(file =".\\new_png\\Reverse_NotPress.png")
+            self.reverseAudioImage=PhotoImage(file =".\\png\\Reverse_NotPress.png")
             self.reverseAudioButton.configure(image=self.reverseAudioImage)
 
         def on_close():#closes threads on shutdown, also confirms user wants to quit
@@ -157,7 +183,7 @@ class GUIWindow:
 
         window=Tk()
         window.title('Compugene')
-        window.geometry("600x400+40+50")
+        window.minsize(1200,700)
         window.config(bg='white')
 
         self.vol=IntVar()
@@ -177,19 +203,31 @@ class GUIWindow:
         #playRecAudioImage = PhotoImage(file = __file__[0:__file__.rfind('\\')] + "\\png\\Record_NotPress.png")
         #playRecAudioImage = PhotoImage(file =r"C:\\Users\\livezeycorrw\\VSWorkspace\\SoftwareEngFinal\\Compugene_Project\\png\\Record_NotPress.png") 
         self.playRecAudioImage=PhotoImage(file =".\\png\\Record_NotPress.png")
-        self.playRecAudioButton = Button(text="RECORD", image=self.playRecAudioImage, borderwidth=0)
-        self.playRecAudioButton.place(relx=.44, rely=.5, width=120, height=170)
+        self.playRecAudioButton = Button(text="RECORD", image=self.playRecAudioImage, borderwidth=0, background='white',activebackground='white')
+        self.playRecAudioButton.place(relx=.46, rely=.59, width=118, height=114)
         self.playRecAudioButton.configure(command= lambda : self.playRecAudio(self.playRecAudioButton))
         self.playRecAudioButton.bind('<ButtonPress>',self.changePlayRecAudioLook)
 
-        self.reverseAudioImage=PhotoImage(file =".\\new_png\\Reverse_NotPress.png")
-        self.reverseAudioButton=Button(image=self.reverseAudioImage, command = lambda : setReverse(), borderwidth=0)
-        self.reverseAudioButton.place(relx=.57, rely=.6, width=70, height=89)
+        self.reverseAudioImage=PhotoImage(file =".\\png\\Reverse_NotPress.png")
+        self.reverseAudioButton=Button(image=self.reverseAudioImage, command = lambda : setReverse(), borderwidth=0, background='white',activebackground='white')
+        self.reverseAudioButton.place(relx=.56, rely=.59, width=70, height=89)
         self.reverseAudioButton.bind('<ButtonPress>',self.changeReverseAudioLook)
         
-        processAudioButton = Button(text="PROCESS", command=lambda : processAudio()).place(relx=.33, rely=.6, relwidth=.1, relheight=.05)
-        deleteAudioButton = Button(text="Delete\nRecording", command= lambda : deleteAudio(self.playRecAudioButton)).place(relx=.04, rely=.04, relwidth=.08, relheight=.08)
-        exportAudioButton = Button(text="Export Audio", command= lambda : exportAudio()).place(relx=.76, rely=.85, relwidth=.17, relheight=.07)
+        self.processAudioImage=PhotoImage(file =".\\png\\Process_Audio_NotPress.png")
+        self.processAudioButton = Button(image=self.processAudioImage, command=lambda : processAudio(), borderwidth=0, background='white',activebackground='white')
+        self.processAudioButton.place(relx=.3, rely=.59, width=192, height=63)
+        self.processAudioButton.bind('<ButtonPress>',self.changeProcessAudioLook)
+
+        self.deleteAudioImage=PhotoImage(file =".\\png\\Delete_Recording_NotPress.png")
+        self.deleteAudioButton = Button(image=self.deleteAudioImage, command= lambda : deleteAudio(self.playRecAudioButton), borderwidth=0, background='white',activebackground='white')
+        self.deleteAudioButton.place(relx=.04, rely=.04, width=137, height=114)
+        self.deleteAudioButton.bind('<ButtonPress>',self.changeDeleteAudioLook)
+
+        self.exportAudioImage = PhotoImage(file =".\\png\\Export_NotPress.png")
+        self.exportAudioButton = Button(image = self.exportAudioImage, command=lambda : exportAudio(), borderwidth=0, background='white',activebackground='white')
+        self.exportAudioButton.place(relx=.76, rely=.85, width=192, height=63)
+        self.exportAudioButton.bind('<ButtonPress>',self.changeExportAudioLook)
+        
         audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
         
         volumeSlider = Scale(from_=-24, to=24, orient=HORIZONTAL, resolution=3, variable=self.vol)
@@ -243,7 +281,12 @@ class GUIWindow:
         outputDeviceMenu.config(bg='#e802c1', fg='black', borderwidth=0, highlightbackground="#c70bb6", font=menuFont)
         outputDeviceMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
         outputDeviceMenu.place(relx=.66, rely=.04, relwidth=.15, relheight=.1)
-        
+
+        rDecal = PhotoImage(file=".\\png\\Right_Decal.png")
+        rightDecalLabel = Label(window,image=rDecal)
+        rightDecalLabel.configure(background='white')
+        rightDecalLabel.place(x=0,rely=0,width=196,height=531)
+
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()
 
