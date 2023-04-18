@@ -43,6 +43,8 @@ class GUIWindow:
         self.exportAudioButton = None
         self.exportAudioImage = None
         self.pBar=None
+        self.loopStart = None
+        self.loopEnd = None
 
     def playRecAudio(self, button): 
 
@@ -66,8 +68,6 @@ class GUIWindow:
             self.audio_seg = self.proc.get_audiosegment()
         elif not self.has_audio:  
             self.is_recording=True
-            self.pBar.configure(mode='indeterminate')
-            self.pBar.start()
             if self.is_44k:
                 self.record_thread = threading.Thread(target=self.rec44k.record, args=(self,depth,dfactor,))
             else:
@@ -80,6 +80,7 @@ class GUIWindow:
             self.is_playing=False
             self.play_thread.join()
             self.play_thread=None
+            self.pBar['value']=0
         else:
             print("RUNNING THE THING")
             self.exp.export2(self.audio_seg)
@@ -142,6 +143,11 @@ class GUIWindow:
             self.playRecAudioButton.configure(image=self.playRecAudioImage)
             self.deleteAudioImage = PhotoImage(file =".\\png\\Delete_Recording_NotPress.png")
             self.deleteAudioButton.configure(image=self.deleteAudioImage)
+            if self.is_playing:
+                self.is_playing=False
+                self.play_thread.join()
+                self.play_thread=None
+            self.pBar['value']=0
 
         def exportAudio(): #add additional formats?
             self.exp.export(self.audio_seg)
@@ -290,6 +296,23 @@ class GUIWindow:
         outputDeviceMenu.config(bg='#e802c1', fg='black', borderwidth=0, highlightbackground="#c70bb6", font=menuFont)
         outputDeviceMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
         outputDeviceMenu.place(relx=.66, rely=.04, relwidth=.15, relheight=.1)
+
+        boxFrame1 = Frame(background='#e802c1')
+        boxFrame1.place(width=200,relx=.32,rely=.46,height=30)
+
+        boxFont = font.Font(family="Helvetica", size=14, weight='bold')
+        boxVar1 = StringVar()
+        self.loopStart = Entry(boxFrame1, background='white',borderwidth=0,font=boxFont, textvariable=boxVar1)
+        self.loopStart.insert(0,'Loop Start (secs)')
+        self.loopStart.pack(padx=3, pady=3)
+
+        boxFrame2 = Frame(background='#ef2497')
+        boxFrame2.place(width=200,relx=.55,rely=.46,height=30)
+
+        boxVar2 = StringVar()
+        self.loopEnd = Entry(boxFrame2, background='white',borderwidth=0,font=boxFont, textvariable=boxVar2)
+        self.loopEnd.insert(0,'Loop End (secs)')
+        self.loopEnd.pack(padx=3, pady=3)
 
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()

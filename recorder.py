@@ -74,6 +74,8 @@ class recorder: #give decimate
 			print('Recording...')
 			gui.playRecAudioImage = PhotoImage(file =".\\png\\Stop_NotPress.png")
 			gui.playRecAudioButton.configure(image=gui.playRecAudioImage)
+			gui.pBar.configure(mode='indeterminate')
+			gui.pBar.start()
 			while(gui.getRecording()):
 				wf.writeframes(stream.read(self.CHUNK))
 			print('Done')
