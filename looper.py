@@ -28,13 +28,9 @@ class looper:
 		print(self.outputs[x])
 		self.output_index = self.outputs[x]
 		
-	def play_audio(self, wf, p, stream, gui): #end playing thread
+	def play_audio(self, wf, p, stream):
 		CHUNK = 1024
-		steps = (wf.getnframes()/wf.getframerate())/wf.getnchannels()
-		completed=0
-		while (gui.getPlaying() and len(data := wf.readframes(CHUNK))):  # Requires Python 	3.8+ for :=
-			completed+=1
-			gui.pBar['value']=int((completed/steps)*1.161)
+		while len(data := wf.readframes(CHUNK)):  # Requires Python 	3.8+ for :=
 			stream.write(data)
 
 	def loop_audio(self, filename, gui):
@@ -46,7 +42,7 @@ class looper:
 							output=True,
 							output_device_index=self.output_index)
 			while gui.getPlaying():
-				self.play_audio(wf, p, stream, gui)
+				self.play_audio(wf, p, stream)
 				wf = wave.open(filename, 'rb')				
 			stream.close()
 			p.terminate()
