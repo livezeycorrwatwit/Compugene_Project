@@ -278,6 +278,10 @@ class GUIWindow:
         window.minsize(1200,700)
         window.config(bg='white')
 
+        rightDecal = PhotoImage(file = '.\\png\\Right_Decal.png')
+        rdLabel = Label(image=rightDecal, background='white')
+        rdLabel.place(relx=1.002,y=-2,anchor='ne')
+
         self.vol=IntVar()
         self.pitch=DoubleVar()
         self.startpoint=DoubleVar()
@@ -415,16 +419,6 @@ class GUIWindow:
         self.loopEnd = Entry(boxFrame2, background='white',borderwidth=0,font=self.boxFont, textvariable=self.boxVar2)
         self.loopEnd.insert(0,'Loop End (secs) N/A')
         self.loopEnd.pack(padx=3, pady=3)
-
-
-
-
-
-
-
-
-
-
 
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()
