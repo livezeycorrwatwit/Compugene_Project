@@ -42,6 +42,7 @@ class GUIWindow:
         self.deleteAudioButton = None
         self.exportAudioButton = None
         self.exportAudioImage = None
+        self.pBar=None
 
     def playRecAudio(self, button): 
 
@@ -51,6 +52,8 @@ class GUIWindow:
         if self.is_recording:
             self.is_recording=False
             print(self.is_recording)
+            self.pBar.configure(mode='determinate')
+            self.pBar.stop()
             self.playRecAudioImage = PhotoImage(file =".\\png\\Play_NotPress.png")
             button.configure(image=self.playRecAudioImage)
             self.record_thread.join()
@@ -63,6 +66,8 @@ class GUIWindow:
             self.audio_seg = self.proc.get_audiosegment()
         elif not self.has_audio:  
             self.is_recording=True
+            self.pBar.configure(mode='indeterminate')
+            self.pBar.start()
             if self.is_44k:
                 self.record_thread = threading.Thread(target=self.rec44k.record, args=(self,depth,dfactor,))
             else:
@@ -197,8 +202,8 @@ class GUIWindow:
         #tri1points = [screenWidth+50,screenHeight,screenWidth+50,screenHeight+30,screenWidth,screenHeight]
         #myCanvas.create_polygon(tri1points, outline=None, fill='#ef2497')
 
-        scrHeight = window.winfo_height()
-        scrWidth = window.winfo_width()
+        scrDim = window.winfo_geometry()
+        print(scrDim)
 
         #playRecAudioImage = PhotoImage(file = __file__[0:__file__.rfind('\\')] + "\\png\\Record_NotPress.png")
         #playRecAudioImage = PhotoImage(file =r"C:\\Users\\livezeycorrw\\VSWorkspace\\SoftwareEngFinal\\Compugene_Project\\png\\Record_NotPress.png") 
@@ -228,7 +233,11 @@ class GUIWindow:
         self.exportAudioButton.place(relx=.76, rely=.85, width=192, height=63)
         self.exportAudioButton.bind('<ButtonPress>',self.changeExportAudioLook)
         
-        audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
+        s=ttk.Style()
+        s.theme_use('clam')
+        s.configure('pink.Horizontal.TProgressbar',background='#ef2497',foreground='#ef2497', darkcolor='#ef2497',lightcolor='#ef2497', troughcolor='#6a0047',bordercolor='#6a0047', borderwidth=4)
+        self.pBar = ttk.Progressbar(mode="determinate", orient="horizontal", style='pink.Horizontal.TProgressbar')
+        self.pBar.place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
         
         volumeSlider = Scale(from_=-24, to=24, orient=HORIZONTAL, resolution=3, variable=self.vol)
         volumeSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
@@ -281,11 +290,6 @@ class GUIWindow:
         outputDeviceMenu.config(bg='#e802c1', fg='black', borderwidth=0, highlightbackground="#c70bb6", font=menuFont)
         outputDeviceMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
         outputDeviceMenu.place(relx=.66, rely=.04, relwidth=.15, relheight=.1)
-
-        rDecal = PhotoImage(file=".\\png\\Right_Decal.png")
-        rightDecalLabel = Label(window,image=rDecal)
-        rightDecalLabel.configure(background='white')
-        rightDecalLabel.place(x=0,rely=0,width=196,height=531)
 
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()
