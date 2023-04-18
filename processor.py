@@ -36,14 +36,24 @@ class processor:
 		self.fwd = not self.fwd
 		return audio
 		
-	def trim(self, audio, start, end):
+	def trim(self, audio, startT, endT):
 		# pydub does things in miliseconds
-		start=int(float(start) * 1000)
-		end=int(float(end) * 1000)
-
+		startT=int(startT)
+		endT=int(endT)
+		
+		start=max(0, startT)
+		end=min(len(self.audio), endT)
+		
+		start=min(start, end-1)
+		end=max(start+1, end)
+		
 		audio = audio [start:end]
 		self.audio=audio
 		return audio
+	
+	##gets length of audiosegment in milliseconds
+	def get_length(self):
+		return len(audio)
 
 	def amplify(self, audio, amp):
 		amp=int(amp)
