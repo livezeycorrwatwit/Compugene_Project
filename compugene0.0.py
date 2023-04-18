@@ -23,7 +23,8 @@
 #
 
 import sys
-import subprocess 
+import subprocess
+import wave
 try: 
 	import pyaudio
 	print("pyaudio works")
@@ -35,11 +36,23 @@ try:
 	print("pydub works")
 except: 
 	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pydub'])
+from pydub import AudioSegment 
 
 
 def main(args):
 	
+
+	
+
 	#call and create gui here
+
+
+
+
+
+
+
+
 
 	'''
 
@@ -174,7 +187,7 @@ class processor:
 		
 		pitched_sound=audio._spawn(audio.raw_data, overrides={'frame_rate': new_sample_rate})
 		
-		pitched_sound = pitched_sound.set_frame_rate(master_framerate)
+		pitched_sound = pitched_sound.set_frame_rate(self.master_framerate)
 		self.audio=pitched_sound
 		return pitched_sound
 
@@ -254,7 +267,6 @@ class looper:
 			stream.close()
 			p.terminate()
 	'''
-	pass
 
 if __name__ == '__main__':
     import sys
