@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter.font as font
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter.ttk import Combobox
 from pydub import AudioSegment
 import threading
 from recorder import recorder
@@ -157,6 +158,7 @@ class GUIWindow:
         window=Tk()
         window.title('Compugene')
         window.geometry("600x400+40+50")
+        window.config(bg='white')
 
         self.vol=IntVar()
         self.pitch=DoubleVar()
@@ -191,43 +193,65 @@ class GUIWindow:
         audioProgressBar = ttk.Progressbar(mode="determinate", orient="horizontal").place(relx=.2, rely=.52, relheight=.05, relwidth=.6)
         
         volumeSlider = Scale(from_=-24, to=24, orient=HORIZONTAL, resolution=3, variable=self.vol)
+        volumeSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
         volumeSlider.place(relx=.05, rely=.72, relheight=.08, relwidth=.27)
         volumeSlider.set(0)
         pitchSlider = Scale(from_=.005, to=5, orient=HORIZONTAL, resolution=.005, variable=self.pitch)
+        pitchSlider.config(bg='white',highlightbackground='white',troughcolor='#e802c1',)
         pitchSlider.place(relx=.05, rely=.89, relheight=.08, relwidth=.27)
         pitchSlider.set(1)
         
         myFont = font.Font(family="Helvetica", size=16, weight='bold', slant='italic')
-        volumeLabel = Label(text="Volume (±db)", font=myFont).place(relx=.04, rely=.65)
-        pitchLabel = Label(text="Pitch (Hz)", font=myFont).place(relx=.04, rely=.82)
+        volumeLabel = Label(text="Volume (±db)", font=myFont)
+        volumeLabel.config(bg='white')
+        volumeLabel.place(relx=.04, rely=.65)
+        pitchLabel = Label(text="Pitch (Hz)", font=myFont)
+        pitchLabel.config(bg='white')
+        pitchLabel.place(relx=.04, rely=.82)
         sampleRates = ["48k","44.1k", "24k","22.05k","12k","11.025k", "6k","5.5125k", "3k", "2.75625k"]
         bitDepths = ["16","8"]
         inputDevices = self.rec44k.getInputDevices() 
         self.rec48k.getInputDevices()
         outputDevices = self.looper.getOutputDevices()
 
-        menuFont = font.Font(family="Helvetica", size=16, weight='bold', slant='italic')
+        menuFont = font.Font(family="Helvetica", size=14, weight='bold')
+        smallMenuFont = font.Font(family="Helvetica", size=12, weight='bold')
         sampleRateInitial = StringVar()
-        sampleRateInitial.set("44.1k")
-        sampleRateMenu = OptionMenu(window,sampleRateInitial,*sampleRates, command=self.selectSample, bg='black').place(relx=.15, rely=.04, relwidth=.2, relheight=.1)
-        
+        sampleRateInitial.set("Sample Rate")
+        sampleRateMenu = OptionMenu(window,sampleRateInitial,*sampleRates, command=self.selectSample)
+        sampleRateMenu.config(bg='#ef2497', fg='black', borderwidth=0, highlightbackground="#d72697", font=menuFont)
+        sampleRateMenu["menu"].config(bg='#6a0047', fg='white', borderwidth=0, font=smallMenuFont)
+        sampleRateMenu.place(relx=.15, rely=.04, relwidth=.15, relheight=.1)
+
         bitDepthInitial = StringVar()
-        bitDepthInitial.set("16")
-        bitDepthMenu = OptionMenu(window,bitDepthInitial,*bitDepths, command=self.selectDepth).place(relx=.36, rely=.04, relwidth=.2, relheight=.1)
+        bitDepthInitial.set("Bit Depth")
+        bitDepthMenu = OptionMenu(window,bitDepthInitial,*bitDepths, command=self.selectDepth)
+        bitDepthMenu.config(bg='#e802c1', fg='black', borderwidth=0, highlightbackground="#c70bb6", font=menuFont)
+        bitDepthMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
+        bitDepthMenu.place(relx=.32, rely=.04, relwidth=.15, relheight=.1)
         
         inputDeviceInitial = IntVar()
         inputDeviceInitial.set("Default Input")
-        inputDeviceMenu = OptionMenu(window,inputDeviceInitial,*inputDevices, command=self.selectInput).place(relx=.57, rely=.04, relwidth=.2, relheight=.1)
+        inputDeviceMenu = OptionMenu(window,inputDeviceInitial,*inputDevices, command=self.selectInput)
+        inputDeviceMenu.config(bg='#ef2497', fg='black', borderwidth=0, highlightbackground="#d72697", font=menuFont)
+        inputDeviceMenu["menu"].config(bg='#6a0047', fg='white', borderwidth=0, font=smallMenuFont)
+        inputDeviceMenu.place(relx=.49, rely=.04, relwidth=.15, relheight=.1)
         
         outputDeviceInitial = IntVar()
         outputDeviceInitial.set("Default Output")
-        bitDepthMenu = OptionMenu(window,outputDeviceInitial,*outputDevices, command=self.looper.setDefaultOutput).place(relx=.78, rely=.04, relwidth=.2, relheight=.1)
+        outputDeviceMenu = OptionMenu(window,outputDeviceInitial,*outputDevices, command=self.looper.setDefaultOutput)
+        outputDeviceMenu.config(bg='#e802c1', fg='black', borderwidth=0, highlightbackground="#c70bb6", font=menuFont)
+        outputDeviceMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
+        outputDeviceMenu.place(relx=.66, rely=.04, relwidth=.15, relheight=.1)
         
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()
 
     def selectSample(self,selection):
-        if selection == "44.1k":
+        if selection == "Sample Rate":
+            self.df="1"
+            self.is_44k = True
+        elif selection == "44.1k":
             self.df="1"
             self.is_44k = True
         elif selection == "22.05k":
@@ -261,7 +285,9 @@ class GUIWindow:
             print("Not valid sample rate")
 
     def selectDepth(self,selection):
-        if selection == "16":
+        if selection == "Bit Depth":
+            self.bd="16"
+        elif selection == "16":
             self.bd="16"
         elif selection == "8":
             self.bd="8"
