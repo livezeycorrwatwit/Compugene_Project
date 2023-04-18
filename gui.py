@@ -206,9 +206,10 @@ class GUIWindow:
         self.rec48k.getInputDevices()
         outputDevices = self.looper.getOutputDevices()
 
+        menuFont = font.Font(family="Helvetica", size=16, weight='bold', slant='italic')
         sampleRateInitial = StringVar()
         sampleRateInitial.set("44.1k")
-        sampleRateMenu = OptionMenu(window,sampleRateInitial,*sampleRates, command=self.selectSample).place(relx=.15, rely=.04, relwidth=.2, relheight=.1)
+        sampleRateMenu = OptionMenu(window,sampleRateInitial,*sampleRates, command=self.selectSample, bg='black').place(relx=.15, rely=.04, relwidth=.2, relheight=.1)
         
         bitDepthInitial = StringVar()
         bitDepthInitial.set("16")
