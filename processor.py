@@ -53,7 +53,7 @@ class processor:
 	
 	##gets length of audiosegment in milliseconds
 	def get_length(self):
-		return len(audio)
+		return len(self.audio)
 
 	def amplify(self, audio, amp):
 		amp=int(amp)
