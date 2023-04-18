@@ -1,5 +1,22 @@
 from tkinter import *
 import tkinter.font as font
+import sys
+import subprocess
+try: #install libraries if user doesn't have them
+	import pyaudio
+	print("pyaudio works")
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
+try: 
+	import PIL
+	print("pil works")
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'Pillow'])
+try: 
+	import pydub
+	print("pydub works")
+except: 
+	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pydub'])
 from PIL import Image, ImageTk
 from tkinter import ttk
 from tkinter import messagebox
@@ -45,6 +62,13 @@ class GUIWindow:
         self.pBar=None
         self.loopStart = None
         self.loopEnd = None
+        self.startpoint = None
+        self.endpoint = None
+        self.startSlider = None
+        self.endSlider = None
+        self.boxFrame1 = None
+        self.boxFrame2 = None
+
 
     def playRecAudio(self, button): 
 
@@ -66,6 +90,9 @@ class GUIWindow:
             else:
                 self.proc = processor(48000, "decimated.wav")
             self.audio_seg = self.proc.get_audiosegment()
+
+            self.endRecording()
+
         elif not self.has_audio:  
             self.is_recording=True
             if self.is_44k:
@@ -89,6 +116,49 @@ class GUIWindow:
             self.is_playing=True
             self.play_thread = threading.Thread(target=self.looper.loop_audio, args=("modified.wav",self,))
             self.play_thread.start()
+
+    def endRecording(self):
+
+        boxFont = font.Font(family="Helvetica", size=14, weight='bold')
+
+        print(self.proc.get_length())
+
+        boxVar1 = StringVar()
+        self.loopStart.destroy()
+        self.loopStart = Entry(self.boxFrame1, background='white',borderwidth=0,font=boxFont, textvariable=boxVar1)
+        self.loopStart.insert(0,'Loop Start (secs) 0')
+        self.loopStart.pack(padx=3, pady=3)
+
+        boxVar2 = StringVar()
+        self.loopEnd.destroy()
+        self.loopEnd = Entry(self.boxFrame2, background='white',borderwidth=0,font=boxFont, textvariable=boxVar2)
+        self.loopEnd.insert(0,'Loop End (secs) N/A')
+        self.loopEnd.pack(padx=3, pady=3)
+
+        self.setEndText(self.proc.get_length()/1000)
+
+        self.startSlider.destroy()
+        startSlider = Scale(from_=0, to=self.proc.get_length()/1000, orient=HORIZONTAL, resolution=.001, variable=self.startpoint, command=self.setStartText)
+        startSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
+        startSlider.place(relx=.2, rely=.4, relheight=.08, relwidth=.6)
+        startSlider.set(0)
+        self.startSlider=startSlider
+        self.endSlider.destroy()
+        endSlider = Scale(from_=0, to=self.proc.get_length()/1000, orient=HORIZONTAL, resolution=.001, variable=self.endpoint, command=self.setEndText)
+        endSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
+        endSlider.place(relx=.2, rely=.45, relheight=.08, relwidth=.6)
+        endSlider.set(self.proc.get_length()/1000)
+        self.endSlider=endSlider
+    
+    def setStartText(self,time): 
+        self.loopStart.delete(0,END)
+        self.loopStart.insert(0,'Loop End (secs)' + str(float(time)))
+        self.startpoint.set(time)
+
+    def setEndText(self,time):
+        self.loopEnd.delete(0,END)
+        self.loopEnd.insert(0,'Loop End (secs)' + str(float(time)))
+        self.endpoint.set(time)
 
     def changePlayRecAudioLook(self, event):
             if self.is_recording:
@@ -123,6 +193,10 @@ class GUIWindow:
     def makeGuiWindow(self):
 
         def processAudio(): 
+            print(type(self.startpoint.get()))
+            print(type(self.endpoint.get()))
+            print("Start",float(self.startpoint.get())*1000)
+            print("End",float(self.endpoint.get())*1000)
             self.processAudioImage = PhotoImage(file =".\\png\\Process_Audio_NotPress.png")
             self.processAudioButton.configure(image=self.processAudioImage)
             self.audio_seg=self.proc.get_master() #revert audio_seg back to its previous state
@@ -130,7 +204,7 @@ class GUIWindow:
             adjustPit()
             if self.revflag:
                 reverseAudio()
-            #adjustTrim(startpoint,endpoint)
+            adjustTrim(float(self.startpoint.get())*1000,float(self.endpoint.get())*1000)
 
         def deleteAudio(button):
             button["text"]="RECORD"
@@ -149,7 +223,7 @@ class GUIWindow:
                 self.play_thread=None
             self.pBar['value']=0
 
-        def exportAudio(): #add additional formats?
+        def exportAudio():
             self.exp.export(self.audio_seg)
             self.exportAudioImage = PhotoImage(file =".\\png\\Export_NotPress.png")
             self.exportAudioButton.configure(image=self.exportAudioImage)
@@ -164,14 +238,21 @@ class GUIWindow:
         def reverseAudio(): 
             self.audio_seg = self.proc.reverse(self.audio_seg)
 
-        def adjustTrim(self,startpoint,endpoint): 
-            #trim(self.audio_seg,startpoint,endpoint)
-            pass
+        def adjustTrim(startpoint,endpoint): 
+            self.audio_seg = self.proc.trim(self.audio_seg,startpoint,endpoint)
 
         def setReverse():
             self.revflag = not self.revflag
             self.reverseAudioImage=PhotoImage(file =".\\png\\Reverse_NotPress.png")
             self.reverseAudioButton.configure(image=self.reverseAudioImage)
+
+        def setStartText(time): #safety measures later
+            self.loopStart.delete(0,END)
+            self.loopStart.insert(0,'Loop End (secs)' + str(float(time)))
+
+        def setEndText(time):
+            self.loopEnd.delete(0,END)
+            self.loopEnd.insert(0,'Loop End (secs)' + str(float(time)))
 
         def on_close():#closes threads on shutdown, also confirms user wants to quit
             if messagebox.askokcancel("Quit", "You will lose all unexported files, do you still want to quit?"):
@@ -199,6 +280,8 @@ class GUIWindow:
 
         self.vol=IntVar()
         self.pitch=DoubleVar()
+        self.startpoint=DoubleVar()
+        self.endpoint=DoubleVar()
         #myCanvas = Canvas(window)
         #myCanvas.place(x=-2, y=-2, relwidth=1.02, relheight=1.02)
 
@@ -297,22 +380,51 @@ class GUIWindow:
         outputDeviceMenu["menu"].config(bg='#630065', fg='white', borderwidth=0, font=smallMenuFont)
         outputDeviceMenu.place(relx=.66, rely=.04, relwidth=.15, relheight=.1)
 
-        boxFrame1 = Frame(background='#e802c1')
-        boxFrame1.place(width=200,relx=.32,rely=.46,height=30)
 
-        boxFont = font.Font(family="Helvetica", size=14, weight='bold')
-        boxVar1 = StringVar()
-        self.loopStart = Entry(boxFrame1, background='white',borderwidth=0,font=boxFont, textvariable=boxVar1)
-        self.loopStart.insert(0,'Loop Start (secs)')
+
+
+        startSlider = Scale(from_=0, to=1, orient=HORIZONTAL, resolution=.001, variable=self.startpoint, command=setStartText) 
+        startSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
+        startSlider.place(relx=.2, rely=.4, relheight=.08, relwidth=.6)
+        startSlider.set(0)
+        self.startSlider = startSlider
+        endSlider = Scale(from_=0, to=1, orient=HORIZONTAL, resolution=.001, variable=self.endpoint, command=setEndText) 
+        endSlider.config(bg='white', highlightbackground='white',troughcolor='#ef2497')
+        endSlider.place(relx=.2, rely=.45, relheight=.08, relwidth=.6)
+        endSlider.set(1000)
+        self.endSlider = endSlider
+
+
+
+        boxFrame1 = Frame(background='#e802c1')
+        boxFrame1.place(width=220,relx=.01,rely=.42,height=30)
+        self.boxFrame1 = boxFrame1
+        
+
+        self.boxFont = font.Font(family="Helvetica", size=14, weight='bold')
+        self.boxVar1 = StringVar()
+        self.loopStart = Entry(boxFrame1, background='white',borderwidth=0,font=self.boxFont, textvariable=self.boxVar1)
+        self.loopStart.insert(0,'Loop Start (secs) 0')
         self.loopStart.pack(padx=3, pady=3)
 
         boxFrame2 = Frame(background='#ef2497')
-        boxFrame2.place(width=200,relx=.55,rely=.46,height=30)
+        boxFrame2.place(width=220,relx=.01,rely=.47,height=30)
+        self.boxFrame2 = boxFrame2
 
-        boxVar2 = StringVar()
-        self.loopEnd = Entry(boxFrame2, background='white',borderwidth=0,font=boxFont, textvariable=boxVar2)
-        self.loopEnd.insert(0,'Loop End (secs)')
+        self.boxVar2 = StringVar()
+        self.loopEnd = Entry(boxFrame2, background='white',borderwidth=0,font=self.boxFont, textvariable=self.boxVar2)
+        self.loopEnd.insert(0,'Loop End (secs) N/A')
         self.loopEnd.pack(padx=3, pady=3)
+
+
+
+
+
+
+
+
+
+
 
         window.protocol("WM_DELETE_WINDOW", on_close)
         window.mainloop()

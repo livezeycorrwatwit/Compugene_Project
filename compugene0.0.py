@@ -30,7 +30,6 @@ try:
 	print("pyaudio works")
 except: 
 	subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyaudio'])
-
 try: 
 	import pydub
 	print("pydub works")
@@ -40,18 +39,6 @@ from pydub import AudioSegment
 
 
 def main(args):
-	
-
-	
-
-	#call and create gui here
-
-
-
-
-
-
-
 
 
 	'''
